@@ -11,8 +11,21 @@ class ContactsList extends StatelessWidget {
         title: Text('Contacts'),
       ),
       body: FutureBuilder<List<Contact>>(
-        future: findAllContacts(),
+        future: Future.delayed(Duration(seconds: 1))
+            .then((value) => findAllContacts()),
         builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  Text('Loading...')
+                ],
+              ),
+            );
+          }
           final List<Contact> contacts = snapshot.data;
           return ListView.builder(
             itemBuilder: (context, index) {
