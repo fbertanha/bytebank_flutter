@@ -1,4 +1,4 @@
-import 'package:bytebank/models/contact.dart';
+import 'package:bytebank/database/dao/contact_dao.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -8,38 +8,9 @@ Future<Database> getDatabase() async {
   return openDatabase(
     path,
     onCreate: (db, version) {
-      db.execute('CREATE TABLE contacts('
-          'id INTEGER PRIMARY KEY, '
-          'name TEXT, '
-          'account_number INTEGER'
-          ')');
+      db.execute(ContactDao.tableSql);
     },
     version: 1,
     onDowngrade: onDatabaseDowngradeDelete,
   );
-}
-
-Future<int> save(Contact contact) async {
-  final Database db = await getDatabase();
-  final Map<String, dynamic> contactMap = Map();
-  contactMap['name'] = contact.name;
-  contactMap['account_number'] = contact.accountNumber;
-
-  return db.insert('contacts', contactMap);
-}
-
-Future<List<Contact>> findAllContacts() async {
-  final Database db = await getDatabase();
-  final List<Map<String, dynamic>> result = await db.query('contacts');
-  final List<Contact> contacts = List();
-
-  result.forEach((item) {
-    contacts.add(new Contact(
-      item['id'],
-      item['name'],
-      item['account_number'],
-    ));
-  });
-
-  return contacts;
 }
