@@ -18,7 +18,7 @@ class _ContactFormState extends State<ContactForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('New newContact'),
+        title: Text('Transfer'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
