@@ -1,3 +1,4 @@
+import 'package:bytebank/components/centered_message.dart';
 import 'package:bytebank/components/progress.dart';
 import 'package:bytebank/database/dao/contact_dao.dart';
 import 'package:bytebank/models/contact.dart';
@@ -42,7 +43,7 @@ class _ContactsListState extends State<ContactsList> {
               );
               break;
           }
-          return null;
+          return CenteredMessage('Unknown error');
         },
       ),
       floatingActionButton: FloatingActionButton(
