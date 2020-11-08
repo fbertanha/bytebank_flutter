@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:bytebank/http/webclient.dart';
-import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/models/transaction.dart';
 import 'package:http/http.dart';
 
@@ -16,8 +15,7 @@ class TransactionWebClient {
   }
 
   Future<Transaction> save(Transaction transaction) async {
-    Map<String, dynamic> transactionMap = _toMap(transaction);
-    final String transactionJson = jsonEncode(transactionMap);
+    final String transactionJson = jsonEncode(transaction.toJson());
 
     final Response response = await client.post(
       baseUrlTransactions,
@@ -33,39 +31,14 @@ class TransactionWebClient {
     final List<Transaction> transactions = List();
 
     decodedJson.forEach((item) {
-      final Transaction transaction = Transaction(
-          item['value'],
-          Contact(
-            0,
-            item['contact']['name'],
-            item['contact']['accountNumber'],
-          ));
-
-      transactions.add(transaction);
+      transactions.add(Transaction.fromJson(item));
     });
     return transactions;
   }
 
   Transaction _toTransaction(Response response) {
     Map<String, dynamic> json = jsonDecode(response.body);
-
-    return Transaction(
-        json['value'],
-        Contact(
-          0,
-          json['contact']['name'],
-          json['contact']['accountNumber'],
-        ));
+    return Transaction.fromJson(json);
   }
 
-  Map<String, dynamic> _toMap(Transaction transaction) {
-    final Map<String, dynamic> transactionMap = {
-      'value': transaction.value,
-      'contact': {
-        'name': transaction.contact.name,
-        'accountNumber': transaction.contact.accountNumber
-      }
-    };
-    return transactionMap;
-  }
 }
