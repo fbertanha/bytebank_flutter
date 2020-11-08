@@ -9,9 +9,10 @@ class TransactionWebClient {
     final Response response =
         await client.get(baseUrlTransactions).timeout(Duration(seconds: 5));
 
-    List<Transaction> transactions = _toTransactions(response);
-
-    return transactions;
+    final List<dynamic> decodedJson = jsonDecode(response.body);
+    return decodedJson
+        .map<Transaction>((dynamic json) => Transaction.fromJson(json))
+        .toList();
   }
 
   Future<Transaction> save(Transaction transaction) async {
@@ -23,22 +24,6 @@ class TransactionWebClient {
       body: transactionJson,
     );
 
-    return _toTransaction(response);
+    return Transaction.fromJson(jsonDecode(response.body));
   }
-
-  List<Transaction> _toTransactions(Response response) {
-    final List<dynamic> decodedJson = jsonDecode(response.body);
-    final List<Transaction> transactions = List();
-
-    decodedJson.forEach((item) {
-      transactions.add(Transaction.fromJson(item));
-    });
-    return transactions;
-  }
-
-  Transaction _toTransaction(Response response) {
-    Map<String, dynamic> json = jsonDecode(response.body);
-    return Transaction.fromJson(json);
-  }
-
 }
