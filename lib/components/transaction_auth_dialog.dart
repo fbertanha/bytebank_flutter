@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 
-class TransactionAuthDialog extends StatelessWidget {
+class TransactionAuthDialog extends StatefulWidget {
+  final Function(String password) onConfirm;
+
+  TransactionAuthDialog({@required this.onConfirm});
+
+  @override
+  _TransactionAuthDialogState createState() => _TransactionAuthDialogState();
+}
+
+class _TransactionAuthDialogState extends State<TransactionAuthDialog> {
+  final _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -9,6 +20,7 @@ class TransactionAuthDialog extends StatelessWidget {
         textAlign: TextAlign.center,
       ),
       content: TextField(
+        controller: _passwordController,
         keyboardType: TextInputType.number,
         obscureText: true,
         maxLength: 4,
@@ -22,11 +34,14 @@ class TransactionAuthDialog extends StatelessWidget {
             'CANCEL',
             style: TextStyle(fontSize: 16),
           ),
-          onPressed: () => print('canceled'),
+          onPressed: () => Navigator.pop(context),
         ),
         FlatButton(
           child: Text('CONFIRM'),
-          onPressed: () => print('hi'),
+          onPressed: () {
+            widget.onConfirm(_passwordController.text);
+            Navigator.pop(context);
+          },
         ),
       ],
     );

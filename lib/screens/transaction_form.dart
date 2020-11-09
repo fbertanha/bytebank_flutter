@@ -1,3 +1,4 @@
+import 'package:bytebank/components/transaction_auth_dialog.dart';
 import 'package:bytebank/http/clients/transaction_webclient.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/models/transaction.dart';
@@ -59,18 +60,7 @@ class _TransactionFormState extends State<TransactionForm> {
                   width: double.maxFinite,
                   child: RaisedButton(
                     child: Text('Transfer'),
-                    onPressed: () async {
-                      final double value =
-                          double.tryParse(_valueController.text);
-                      final transactionCreated =
-                          Transaction(value, widget.contact);
-
-                      final Transaction newTransaction =
-                          await _webClient.save(transactionCreated);
-                      if (newTransaction != null) {
-                        Navigator.pop(context);
-                      }
-                    },
+                    onPressed: () => _doTransfer(context),
                   ),
                 ),
               )
@@ -79,5 +69,26 @@ class _TransactionFormState extends State<TransactionForm> {
         ),
       ),
     );
+  }
+
+  void _doTransfer(BuildContext context) async {
+    final double value = double.tryParse(_valueController.text);
+    final transactionCreated = Transaction(value, widget.contact);
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return TransactionAuthDialog(
+            onConfirm: (password) async {
+              print(password);
+
+              final Transaction newTransaction =
+                  await _webClient.save(transactionCreated, password);
+              if (newTransaction != null) {
+                Navigator.pop(context);
+              }
+            },
+          );
+        });
   }
 }
