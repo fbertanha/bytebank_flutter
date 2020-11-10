@@ -87,10 +87,12 @@ class _TransactionFormState extends State<TransactionForm> {
 
   Future _save(Transaction transactionCreated, String password,
       BuildContext context) async {
-    final Transaction newTransaction =
-        await _webClient.save(transactionCreated, password);
-    if (newTransaction != null) {
-      Navigator.pop(context);
-    }
+    _webClient.save(transactionCreated, password).then((newTransaction) {
+      if (newTransaction != null) {
+        Navigator.pop(context);
+      }
+    }).catchError((error) {
+      print('$error');
+    });
   }
 }
