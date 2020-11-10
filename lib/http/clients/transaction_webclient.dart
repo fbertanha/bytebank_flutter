@@ -8,7 +8,8 @@ import 'package:http/http.dart';
 class TransactionWebClient {
   static final Map<int, String> _statusCodeResponses = {
     400: 'there was an error submitting the transaction',
-    401: 'authentication failed'
+    401: 'authentication failed',
+    409: 'transaction already exists'
   };
 
   Future<List<Transaction>> findAll() async {
@@ -23,6 +24,7 @@ class TransactionWebClient {
   Future<Transaction> save(Transaction transaction, String password) async {
     final String transactionJson = jsonEncode(transaction.toJson());
 
+    await Future.delayed(Duration(seconds: 10));
     final Response response = await client.post(
       baseUrlTransactions,
       headers: {'Content-type': 'application/json', 'password': password},
@@ -33,7 +35,14 @@ class TransactionWebClient {
       return Transaction.fromJson(jsonDecode(response.body));
     }
 
-    throw HttpException(_statusCodeResponses[response.statusCode]);
+    throw HttpException(_getMessage(response.statusCode));
+  }
+
+  String _getMessage(int statusCode) {
+    if (_statusCodeResponses.containsKey(statusCode)) {
+      return _statusCodeResponses[statusCode];
+    }
+    return 'unknown error';
   }
 }
 
