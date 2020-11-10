@@ -14,7 +14,7 @@ class LoggingInterceptor implements InterceptorContract {
   @override
   Future<ResponseData> interceptResponse({ResponseData data}) async {
     debugPrint(
-        'Response from: ${methodToString(data.method)} ${data.url} ${data.statusCode} ');
+        'Response from: ${data.statusCode} ${methodToString(data.method)} ${data.url}');
     debugPrint('headers: ${data.headers}');
     debugPrint('body: ${data.body}');
     debugPrint('---------------------');
