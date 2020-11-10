@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bytebank/components/progress.dart';
 import 'package:bytebank/components/response_dialog.dart';
 import 'package:bytebank/components/transaction_auth_dialog.dart';
 import 'package:bytebank/http/clients/transaction_webclient.dart';
@@ -22,6 +23,8 @@ class _TransactionFormState extends State<TransactionForm> {
   final TransactionWebClient _webClient = TransactionWebClient();
   final String _transactionId = Uuid().v4();
 
+  bool _showLoading = false;
+
   @override
   Widget build(BuildContext context) {
     print('transaction form id: $_transactionId');
@@ -35,6 +38,15 @@ class _TransactionFormState extends State<TransactionForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Visibility(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Progress(
+                    message: 'Sending transaction...',
+                  ),
+                ),
+                visible: _showLoading,
+              ),
               Text(
                 widget.contact.name,
                 style: TextStyle(
@@ -94,6 +106,9 @@ class _TransactionFormState extends State<TransactionForm> {
 
   Future _save(Transaction transactionCreated, String password,
       BuildContext context) async {
+    setState(() {
+      _showLoading = true;
+    });
     final Transaction newTransaction =
         await _webClient.save(transactionCreated, password).catchError((error) {
       _showFailureMessage(context, message: error.message);
@@ -101,6 +116,10 @@ class _TransactionFormState extends State<TransactionForm> {
       _showFailureMessage(context, message: 'timeout submitting transaction');
     }, test: (e) => e is TimeoutException).catchError((error) {
       _showFailureMessage(context);
+    }).whenComplete(() {
+      setState(() {
+        _showLoading = false;
+      });
     });
 
     await _showSuccessfulTransaction(newTransaction, context);
